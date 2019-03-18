@@ -6,10 +6,17 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-TRIGGER = 23
+TRIG = 23
 ECHO = 24
+
+GPIO.setup(TRIGGER,GPIO.OUT)
+GPIO.setup(ECHO, GPIO.IN)
 
 while True:
     
     GPIO.output(TRIGGER, GPIO.LOW)
-    
+    print "Warten..."
+	time.sleep(2)
+	
+	GPIO.output(TRIG, GPIO.HIGH)
+	time.sleep(0.00001)
