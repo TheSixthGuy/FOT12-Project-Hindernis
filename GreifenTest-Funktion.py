@@ -12,6 +12,19 @@ MotorC = 5
 GPIO.setup(MotorC, GPIO.OUT)  #Pins als Ausgange definieren
 #GPIO.setup(MotorB, GPIO.OUT)  #
 
+pwmC=GPIO.PWM(MotorA, 50)     #Pulse Width Modulation einstellen. Nötig für Servomotoren
+
+pwmC.start(0)                 #Arbeitszyklus auf 0 setzen damit keine Drehung gesetzt wird
+
+Grip()
+time.sleep(10)
+
+Release()
+time.sleep(5)
+
+pwm.stop()
+GPIO.cleanup
+
 def Grip():         #Funktion um die gewollte Drehung der Motoren auszuführen
     duty = 90 / 18 + 2          #Benötiger Arbeitszyklus ausrechnen
     GPIO.output(MotorC, GPIO.HIGH)  #Ausgabe auf den PIN von MotorA
