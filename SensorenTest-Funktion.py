@@ -16,7 +16,9 @@ while True:
     
     GPIO.output(TRIGGER, GPIO.LOW)
     print "Warten..."
-	time.sleep(2)
-	
-	GPIO.output(TRIG, GPIO.HIGH)
-	time.sleep(0.00001)
+    time.sleep(2)
+    
+    GPIO.output(TRIG, GPIO.HIGH)
+    time.sleep(0.00001)
+
+#Bis KW13
