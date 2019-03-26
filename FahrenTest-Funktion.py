@@ -8,25 +8,28 @@ GPIO.setwarnings(False)  #Zum ausschalten von nicht kritischen fehlermeldungen
 GPIO.setmode(GPIO.BCM)   #Einschalten des Boardmode(Pin-nummerierung)
 print("Boardmode set")
 
-MotorA = 3               #GPIO-PIN-Nummer der Motoren in deren variable speichern
-MotorB = 4               #
+MotorA = 25                #GPIO-PIN-Nummer der Motoren in deren variable speichern
+MotorB = 7 
+MotorC = 10
+
+MotorA_pwm = 8
+MotorB_pwm = 12
+MotorC_pwm = 9
 
 GPIO.setup(MotorA, GPIO.OUT)  #Pins als Ausgange definieren
 GPIO.setup(MotorB, GPIO.OUT)  #
+GPIO.setup(MotorC, GPIO.OUT)
+GPIO.setup(MotorA_pwm, GPIO.OUT)
+GPIO.setup(MotorB_pwm, GPIO.OUT)
+GPIO.setup(MotorC_pwm, GPIO.OUT)
 
-pwmA=GPIO.PWM(MotorA, 50)     #Pulse Width Modulation einstellen. Nötig für Servomotoren
-pwmB=GPIO.PWM(MotorB, 50)     #
+#pwmA = GPIO.PWM()
 
-pwmA.start(0)                 #Arbeitszyklus auf 0 setzen damit keine Drehung gesetzt wird
-pwmB.start(0)                 #
 
-SetAngleA(90)                 #Um 90 Grad nach vorne Drehen (ungestestet)
-SetAngleB(90)                 #
-
-pwm.stop()                    #Beenden der Motor Steuerung
 GPIO.cleanup                  #
 print("Cleanup")
 
+'''
 def SetAngleA(angle):         #Funktion um die gewollte Drehung der Motoren auszuführen
     duty = angle / 18 + 2          #Benötiger Arbeitszyklus ausrechnen
     GPIO.output(MotorA, GPIO.HIGH)  #Ausgabe auf den PIN von MotorA
@@ -42,3 +45,16 @@ def SetAngleB(angle):         #Kopie von SetAngleA aber für MotorB
     time.sleep(1)
     GPIO.output(MotorB,GPIO.LOW)
     pwm.ChangeDutyCycle(0)    
+'''
+'''
+pwmA=GPIO.PWM(MotorA, 50)     #Pulse Width Modulation einstellen. Nötig für Servomotoren
+pwmB=GPIO.PWM(MotorB, 50)     #
+
+pwmA.start(0)                 #Arbeitszyklus auf 0 setzen damit keine Drehung gesetzt wird
+pwmB.start(0)                 #
+
+SetAngleA(90)                 #Um 90 Grad nach vorne Drehen (ungestestet)
+SetAngleB(90)                 #
+
+pwm.stop()                    #Beenden der Motor Steuerung
+'''
