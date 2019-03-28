@@ -33,12 +33,14 @@ while True:
     Distanz = Puls_Dauer * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
     Distanz = round(Distanz, 2)         #runden des Ergebnis auf 2 nachkommastellen
     
-    if Distanz > 2 and Distanz < 400:   # bei näher als 2 cm ist gewicht gefunden 
-        print ("Gefunden!")
+    if Distanz > 2 and Distanz < 400:   # bei weiter weg als 2 cm ist gewicht noch gesuchtund von vorne anfangen
+        print ("Suchen..")
         #Motor Stop
         #Grip()
     else:
-        print ("Suchen...")             # bei weiter weg als 2 cm ist noch am suche dann von vorne anfangen
+        print ("Gefunden!")             # bei näher als 2 gefunden
+        #Motor Stop
+        #Grip()
     
 GPIO.cleanup
 
