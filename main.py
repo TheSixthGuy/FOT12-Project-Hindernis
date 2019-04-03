@@ -14,7 +14,8 @@ verlorenH = False   #Hindernis verloren Bool
 gefundenZ = False   #Ziel gefunden Bool
 drehenF = False     #Drehen Fertig Bool
 
-Lenkung = 1  #Statische(?) Varibale für die Lenkung 1 = voll rechts, -1 = voll links
+
+Lenkung = 0.5  #Statische(?) Varibale für die Lenkung 1 = voll rechts, -1 = voll links
 power1 = 0x6b       #Hexadezimaladresee für den Strom des gyroscope
 power2 = 0x6c       #?
 TrigA = 23          #Varibale TRIGGER ist GPIO-Pinnummer für das Auslösen des US-Sensors
@@ -67,9 +68,10 @@ def DrehenStelle(KraftD):# Auf der stelle drehen
     MotorB2.ChangeDutyCycle(KraftD)
 
 def Kurve():
-    MotorA1.ChangeDutyCycle((((1/3)*(Lenkung**3))-(0.5*(Lenkung**2))+((2/3)*Lenkung)+0.5)*100) #Eine kurve fahren nach der Gleichung von tim
-    MotorB1.ChangeDutyCycle((((-1/3)*(Lenkung**3))-(0.5*(Lenkung**2))-((2/3)*Lenkung)+0.5)*100)
-    
+    MotorA1.ChangeDutyCycle (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100) #Eine kurve fahren nach der Gleichung von tim
+    MotorB1.ChangeDutyCycle (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
+print (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
+print (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
 def Stop(): #alle Fahr-motoren stoppen
     MotorA1.ChangeDutyCycle(0)
     MotorA2.ChangeDutyCycle(0)
@@ -160,11 +162,13 @@ while gefundenG == False:    #Suchen des Gewichts, wenn Gewicht näher als 5cm a
     if DistanzA() < 5:
         Stop()
         gefundenG = True
+        
+time.sleep(1)
 
 Greifen(10)  #Greifen des Gewichts
 Vorwaerts(20) #Zum hindernis fahren
 while gefundenH == False:   #Der Seitliche ultraschall-sensor schaut nach dem Hindernis und speichert die Entfernung
-    if DistanzB() < 40:
+    if  DistanzB() < 40:
         HindernisDistanz = DistanzB()
         gefundenH = True
 
@@ -173,6 +177,8 @@ while verlorenH == False:   #Der Seitliche US-Sensor gibt an wenn er das Hindern
         time.sleep(2)
         Stop()
         verlorenH = True
+
+time.sleep(1)
 
 bus.write_byte_data(address,power1,0)   #der gyroscope wird initalisiert
 #TODO Gyro
@@ -188,15 +194,19 @@ while drehenF == False: #Am Gyroscope auslesen ob man sich um 90° gedreht hat
     if (StartX - wordLesen_2c(0x43)) > 90:
         Stop()
         drehenF = True
-
+        
+time.sleep(1)
 Vorwaerts(20) #langsam vorwaerts
+
 while gefundenZ == False: #wenn näher als 50cm zum schrank gewicht fallen lassen
     if DistanzA() < 50:
         Stop()
         gefundenZ = True
 
+time.sleep(2)
 Loslassen() #gehört zur dem daruber
 
+MotorA1.stop
 MotorA2.stop  #Moteren anhalten
 MotorB1.stop
 MotorB2.stop
