@@ -15,7 +15,17 @@ MotorA2 = GPIO.PWM(8, 50)
 MotorB2 = GPIO.PWM(12,50)
 MotorC2 = GPIO.PWM(9, 50)
 
+Greifen()
+Loslassen()
+MotorTestA()
+MotorTestB()
 
+MotorA1.stop
+MotorA2.stop
+MotorB1.stop
+MotorB2.stop
+MotorC1.stop
+MotorC2.stop
 GPIO.cleanup                  #
 print("Cleanup")
 
@@ -39,3 +49,11 @@ def MotorTestA():
     time.sleep(1)
     MotorA2.ChangeDutyCycle(0)
     
+def MotorTestB()
+    MotorA1.start(60)
+    time.sleep(1)
+    MotorA1.ChangeDutyCycle(0)
+    time.sleep(1)
+    MotorA2.start(60)
+    time.sleep(1)
+    MotorA2.ChangeDutyCycle(0)
