@@ -91,7 +91,7 @@ def DistanzA(): #funktion der Distanzmessung des US-SensorA(voren). Gibt das Erg
     
     GPIO.output(TrigA, GPIO.LOW) #Erholungszeit für den Sensor? (Wird eindeutig noch verändert9
     print ("Warten...")
-    time.sleep(2)
+    #time.sleep(2)
     
     GPIO.output(TrigA, GPIO.HIGH) #Auslösen des US-Sensor für ein Bruchteil einer Sekunde
     time.sleep(0.00001)
@@ -113,7 +113,7 @@ def DistanzB(): #das gleiche für US-SensorB(Hinten)
 
     GPIO.output(TrigB, GPIO.LOW) #Erholungszeit für den Sensor? (Wird eindeutig noch verändert9
     print ("Warten...")
-    time.sleep(2)
+    #time.sleep(2)
     
     GPIO.output(TrigB, GPIO.HIGH) #Auslösen des US-Sensor für ein Bruchteil einer Sekunde
     time.sleep(0.00001)
