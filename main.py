@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO #Libary für die Benutzung von den GPIO-Pins
 import time             #Libary für Zeit-basierte Funktionen
 import smbus            #Libary für die benutzung des Datenbus-System I2C für das gyroscope
 import math             #Libary für Mathe Funktion wie z.B Wurzel von
-import random           #Libary für zufällige Nummern
+import random           #Libary für zufällige Nummern(unötig)
 
 #GPIO.setwarnings(False) #Ausschalten der Warnmeldung der GPIO-Pins
 GPIO.setmode(GPIO.BCM)   #Einschalten in das Breadboard-Pin system
@@ -16,7 +16,7 @@ drehenF = False     #Drehen Fertig Bool
 
 
 Lenkung = 0.5  #Statische(?) Varibale für die Lenkung 1 = voll rechts, -1 = voll links
-power1 = 0x6b       #Hexadezimaladresee für den Strom des gyroscope
+power1 = 0x6b       #Hexadezimaladresse für den Strom des gyroscope
 power2 = 0x6c       #?
 TrigA = 23          #Varibale TRIGGER ist GPIO-Pinnummer für das Auslösen des US-Sensors
 EchoA = 24          #Varibale Echo ist die GPIO-Pinnummer für den Pin des Echos/Output des Us-Sensors
@@ -29,7 +29,7 @@ MB2_Pin = 8
 MC1_Pin = 12
 MC2_Pin = 9
 bus = smbus.SMBus(1)    #Starten des Datenbus-System für das Gyroscope
-address = 0x68 #Hexadezimaladresee des Gyroscope 
+address = 0x68 #Hexadezimaladresse des Gyroscope 
 
 GPIO.setup(TrigA,GPIO.OUT)    #init der Pins
 GPIO.setup(EchoA, GPIO.IN)    #
@@ -42,11 +42,11 @@ GPIO.setup(MB2_Pin, GPIO.OUT)
 GPIO.setup(MC1_Pin, GPIO.OUT)
 GPIO.setup(MC2_Pin, GPIO.OUT)
 MotorA1 = GPIO.PWM(MA1_Pin, 50)                #Pins der Motoren festlegen und Frequenz
-MotorB1 = GPIO.PWM(MB1_Pin, 50)                 #
+MotorB1 = GPIO.PWM(MB1_Pin, 50)                #
 MotorC1 = GPIO.PWM(MC1_Pin, 50)                #
-MotorA2 = GPIO.PWM(MA2_Pin, 50)                 #
+MotorA2 = GPIO.PWM(MA2_Pin, 50)                #
 MotorB2 = GPIO.PWM(MB2_Pin,50)                 #
-MotorC2 = GPIO.PWM(MC2_Pin, 50)                 #
+MotorC2 = GPIO.PWM(MC2_Pin, 50)                #
 
 MotorA1.start(0)    #Starten der Motoren ohne Drehung
 MotorA2.start(0)    #
@@ -59,7 +59,7 @@ def Vorwaerts(KraftV):  #vorwaerts waren mit der Angegeben geschwindigkeit in % 
     MotorA1.ChangeDutyCycle(KraftV)
     MotorB2.ChangeDutyCycle(KraftV)
     
-def Rueckwaerts(KraftR): #das gleiche für rückwärts fahren
+def Rueckwaerts(KraftR): #das gleiche für rückwärts fahren(nicht nötig)
     MotorA2.ChangeDutyCycle(KraftR)
     MotorB2.ChangeDutyCycle(KraftR)
 
@@ -67,11 +67,14 @@ def DrehenStelle(KraftD):# Auf der stelle drehen
     MotorA1.ChangeDutyCycle(KraftD)
     MotorB2.ChangeDutyCycle(KraftD)
 
+'''
 def Kurve():
     MotorA1.ChangeDutyCycle (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100) #Eine kurve fahren nach der Gleichung von tim
     MotorB1.ChangeDutyCycle (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
-print (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
-print (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
+    print (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
+    print (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
+'''
+
 def Stop(): #alle Fahr-motoren stoppen
     MotorA1.ChangeDutyCycle(0)
     MotorA2.ChangeDutyCycle(0)
@@ -185,10 +188,14 @@ bus.write_byte_data(address,power1,0)   #der gyroscope wird initalisiert
 GyX = wordLesen_2c(0x43) #Die ausgabe der X-Achse des Gyros wird gelsesen
 StartX = GyX / 131  #(?) Wird in Grad umgerechnet
 
+'''
 if random.randint(0,1) == 1: #Temp Spaß-Funktion Munz-Wurf zum auswählen der Dreh-Methode
     Kurve() #
 else:
     DrehenStelle(30)
+'''
+
+DrehenStelle(30)
 
 while drehenF == False: #Am Gyroscope auslesen ob man sich um 90° gedreht hat
     if (StartX - wordLesen_2c(0x43)) > 90:
