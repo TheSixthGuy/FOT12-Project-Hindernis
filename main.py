@@ -1,11 +1,12 @@
-#!Main.py
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import RPi.GPIO as GPIO #Libary für die Benutzung von den GPIO-Pins
 import time             #Libary für Zeit-basierte Funktionen
 import smbus            #Libary für die benutzung des Datenbus-System I2C für das gyroscope
 import math             #Libary für Mathe Funktion wie z.B Wurzel von
 import random           #Libary für zufällige Nummern(unötig)
 
-#GPIO.setwarnings(False) #Ausschalten der Warnmeldung der GPIO-Pins
+GPIO.setwarnings(False) #Ausschalten der Warnmeldung der GPIO-Pins
 GPIO.setmode(GPIO.BCM)   #Einschalten in das Breadboard-Pin system
 
 gefundenG = False   #Gewicht gefunden Bool(True or False)
@@ -13,7 +14,6 @@ gefundenH = False   #Hindernis gefunden Bool
 verlorenH = False   #Hindernis verloren Bool
 gefundenZ = False   #Ziel gefunden Bool
 drehenF = False     #Drehen Fertig Bool
-
 
 Lenkung = 0.5  #Statische(?) Varibale für die Lenkung 1 = voll rechts, -1 = voll links
 power1 = 0x6b       #Hexadezimaladresse für den Strom des gyroscope
@@ -57,7 +57,7 @@ MotorC2.start(0)    #
 
 def Vorwaerts(KraftV):  #vorwaerts waren mit der Angegeben geschwindigkeit in % der maximal Leistung
     MotorA1.ChangeDutyCycle(KraftV)
-    MotorB2.ChangeDutyCycle(KraftV)
+    MotorB1.ChangeDutyCycle(KraftV)
     
 def Rueckwaerts(KraftR): #das gleiche für rückwärts fahren(nicht nötig)
     MotorA2.ChangeDutyCycle(KraftR)
@@ -85,25 +85,24 @@ def Greifen(KraftG): #greifen des gewichts
     MotorC2.ChangeDutyCycle(0)
     MotorC1.start(KraftG)
     time.sleep(2)
-    
-def Loslassen(KraftL): #loslassen des Gewichts
     MotorC1.ChangeDutyCycle(0)
-    MotorC2.start(KraftL)
+    
+def Loslassen(): #loslassen des Gewichts
+    MotorC1.ChangeDutyCycle(0)
+    MotorC2.start(100)
     time.sleep(2)
     MotorC2.ChangeDutyCycle(0)
     
 def DistanzA(): #funktion der Distanzmessung des US-SensorA(voren). Gibt das Ergebnis in cm wieder
     
     GPIO.output(TrigA, GPIO.LOW) #Erholungszeit für den Sensor? (Wird eindeutig noch verändert9
-    print ("Warten...")
-    #time.sleep(2)
     
     GPIO.output(TrigA, GPIO.HIGH) #Auslösen des US-Sensor für ein Bruchteil einer Sekunde
     time.sleep(0.00001)
     GPIO.output(TrigA, GPIO.LOW)
     
     while GPIO.input(EchoA)==0:      #zeitpunkt des Auslösen festnehemn
-        Puls_Start = time.time()
+        Puls_StartA = time.time()
         
     while GPIO.input(EchoA)==1:      #Zeitpunkt der Aufnahme des Echos
         Puls_EndeA = time.time()
@@ -117,8 +116,6 @@ def DistanzA(): #funktion der Distanzmessung des US-SensorA(voren). Gibt das Erg
 def DistanzB(): #das gleiche für US-SensorB(Hinten)
 
     GPIO.output(TrigB, GPIO.LOW) #Erholungszeit für den Sensor? (Wird eindeutig noch verändert9
-    print ("Warten...")
-    #time.sleep(2)
     
     GPIO.output(TrigB, GPIO.HIGH) #Auslösen des US-Sensor für ein Bruchteil einer Sekunde
     time.sleep(0.00001)
@@ -134,7 +131,7 @@ def DistanzB(): #das gleiche für US-SensorB(Hinten)
                      
     DistanzB = Puls_DauerB * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
     DistanzB = round(DistanzB, 2)         #runden des Ergebnis auf 2 nachkommastellen
-    return DistanzA
+    return DistanzB
 
 def byteLesen(reg): #Lesen der Ausgabe des gyroscope
     return bus.read_byte_data(address, reg)
@@ -160,16 +157,18 @@ def get_x_rotation(x,y,z): #Accelormeter x rotation
     radien = math.atan2(y, distanz(x,z))
     return math.degrees(radien)
 
-Vorwaerts(10)
+Vorwaerts(35)
+'''
 while gefundenG == False:    #Suchen des Gewichts, wenn Gewicht näher als 5cm aufhören von Fahren
     if DistanzA() < 5:
         Stop()
         gefundenG = True
+'''
         
-time.sleep(1)
+time.sleep(1.5)
 
-Greifen(10)  #Greifen des Gewichts
-Vorwaerts(20) #Zum hindernis fahren
+Greifen(100)  #Greifen des Gewichts
+Vorwaerts(30) #Zum hindernis fahren
 while gefundenH == False:   #Der Seitliche ultraschall-sensor schaut nach dem Hindernis und speichert die Entfernung
     if  DistanzB() < 40:
         HindernisDistanz = DistanzB()
@@ -183,30 +182,33 @@ while verlorenH == False:   #Der Seitliche US-Sensor gibt an wenn er das Hindern
 
 time.sleep(1)
 
+'''
 bus.write_byte_data(address,power1,0)   #der gyroscope wird initalisiert
 #TODO Gyro
 GyX = wordLesen_2c(0x43) #Die ausgabe der X-Achse des Gyros wird gelsesen
 StartX = GyX / 131  #(?) Wird in Grad umgerechnet
 
-'''
 if random.randint(0,1) == 1: #Temp Spaß-Funktion Munz-Wurf zum auswählen der Dreh-Methode
     Kurve() #
 else:
     DrehenStelle(30)
 '''
 
-DrehenStelle(30)
+DrehenStelle(100)
 
+'''
 while drehenF == False: #Am Gyroscope auslesen ob man sich um 90° gedreht hat
     if (StartX - wordLesen_2c(0x43)) > 90:
         Stop()
         drehenF = True
+''' 
         
-time.sleep(1)
-Vorwaerts(20) #langsam vorwaerts
+time.sleep(2)
+
+Vorwaerts(30) #langsam vorwaerts
 
 while gefundenZ == False: #wenn näher als 50cm zum schrank gewicht fallen lassen
-    if DistanzA() < 50:
+    if DistanzA() < 40:
         Stop()
         gefundenZ = True
 
