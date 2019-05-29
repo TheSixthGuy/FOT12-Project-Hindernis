@@ -23,17 +23,17 @@ EchoA = 24          #Varibale Echo ist die GPIO-Pinnummer für den Pin des Echos
 TrigB = 17          #
 EchoB = 27          #
 MA1_Pin = 25
-MA2_Pin = 7
-MB1_Pin = 10
-MB2_Pin = 8
-MC1_Pin = 12
+MA2_Pin = 8
+MB1_Pin = 7
+MB2_Pin = 12
+MC1_Pin = 10
 MC2_Pin = 9
 bus = smbus.SMBus(1)    #Starten des Datenbus-System für das Gyroscope
 address = 0x68 #Hexadezimaladresse des Gyroscope 
 
-GPIO.setup(TrigA,GPIO.OUT)    #init der Pins
+GPIO.setup(TrigA, GPIO.OUT)    #init der Pins
 GPIO.setup(EchoA, GPIO.IN)    #
-GPIO.setup(TrigB,GPIO.OUT)    #init der Pins
+GPIO.setup(TrigB, GPIO.OUT)    #init der Pins
 GPIO.setup(EchoB, GPIO.IN)    #
 GPIO.setup(MA1_Pin, GPIO.OUT)
 GPIO.setup(MA2_Pin, GPIO.OUT)
@@ -45,7 +45,7 @@ MotorA1 = GPIO.PWM(MA1_Pin, 50)                #Pins der Motoren festlegen und F
 MotorB1 = GPIO.PWM(MB1_Pin, 50)                #
 MotorC1 = GPIO.PWM(MC1_Pin, 50)                #
 MotorA2 = GPIO.PWM(MA2_Pin, 50)                #
-MotorB2 = GPIO.PWM(MB2_Pin,50)                 #
+MotorB2 = GPIO.PWM(MB2_Pin, 50)                 #
 MotorC2 = GPIO.PWM(MC2_Pin, 50)                #
 
 MotorA1.start(0)    #Starten der Motoren ohne Drehung
@@ -67,14 +67,6 @@ def DrehenStelle(KraftD):# Auf der stelle drehen
     MotorA1.ChangeDutyCycle(KraftD)
     MotorB2.ChangeDutyCycle(KraftD)
 
-'''
-def Kurve():
-    MotorA1.ChangeDutyCycle (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100) #Eine kurve fahren nach der Gleichung von tim
-    MotorB1.ChangeDutyCycle (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
-    print (((1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
-    print (((-1/3)*(math.pow(Lenkung,3)))-(0.5*(math.pow(Lenkung,2))+((2/3)*Lenkung)+0.5)*100)
-'''
-
 def Stop(): #alle Fahr-motoren stoppen
     MotorA1.ChangeDutyCycle(0)
     MotorA2.ChangeDutyCycle(0)
@@ -83,15 +75,17 @@ def Stop(): #alle Fahr-motoren stoppen
     
 def Greifen(KraftG): #greifen des gewichts
     MotorC2.ChangeDutyCycle(0)
-    MotorC1.start(KraftG)
-    time.sleep(2)
+    MotorC1.ChangeDutyCycle(KraftG)
+    time.sleep(2.5)
     MotorC1.ChangeDutyCycle(0)
+    MotorC1.stop()
     
 def Loslassen(): #loslassen des Gewichts
     MotorC1.ChangeDutyCycle(0)
-    MotorC2.start(100)
-    time.sleep(2)
+    MotorC2.ChangeDutyCycle(15)
+    time.sleep(2.6)
     MotorC2.ChangeDutyCycle(0)
+    MotorC2.stop()
     
 def DistanzA(): #funktion der Distanzmessung des US-SensorA(voren). Gibt das Ergebnis in cm wieder
     
@@ -102,19 +96,21 @@ def DistanzA(): #funktion der Distanzmessung des US-SensorA(voren). Gibt das Erg
     GPIO.output(TrigA, GPIO.LOW)
     
     while GPIO.input(EchoA)==0:      #zeitpunkt des Auslösen festnehemn
-        Puls_StartA = time.time()
+        PulsStartA = time.time()
         
     while GPIO.input(EchoA)==1:      #Zeitpunkt der Aufnahme des Echos
-        Puls_EndeA = time.time()
+        PulsEndeA = time.time()
                      
-    Puls_DauerA = Puls_EndeA - Puls-StartA  #Ausrechnen der zeit differenz zwischen auslösen und des Echo
+    PulsDauerA = PulsEndeA - PulsStartA  #Ausrechnen der zeit differenz zwischen auslösen und des Echo
                      
-    DistanzA = Puls_DauerA * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
+    DistanzA = PulsDauerA * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
     DistanzA = round(DistanzA, 2)         #runden des Ergebnis auf 2 nachkommastellen
     return DistanzA
 
 def DistanzB(): #das gleiche für US-SensorB(Hinten)
-
+    
+    PulsStartB = time.time()
+    
     GPIO.output(TrigB, GPIO.LOW) #Erholungszeit für den Sensor? (Wird eindeutig noch verändert9
     
     GPIO.output(TrigB, GPIO.HIGH) #Auslösen des US-Sensor für ein Bruchteil einer Sekunde
@@ -122,14 +118,14 @@ def DistanzB(): #das gleiche für US-SensorB(Hinten)
     GPIO.output(TrigB, GPIO.LOW)
     
     while GPIO.input(EchoB)==0:      #zeitpunkt des Auslösen festnehemn
-        Puls_Start = time.time()
+        PulsStartB = time.time()
         
     while GPIO.input(EchoB)==1:      #Zeitpunkt der Aufnahme des Echos
-        Puls_EndeB = time.time()
+        PulsEndeB = time.time()
                      
-    Puls_DauerB = Puls_EndeB - Puls-StartB  #Ausrechnen der zeit differenz zwischen auslösen und des Echo
+    PulsDauerB = PulsEndeB - PulsStartB  #Ausrechnen der zeit differenz zwischen auslösen und des Echo
                      
-    DistanzB = Puls_DauerB * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
+    DistanzB = PulsDauerB * 17150        #Ausrechnen der Distanz anhand zeitdifferenz * Schallgeschwindigkeit 
     DistanzB = round(DistanzB, 2)         #runden des Ergebnis auf 2 nachkommastellen
     return DistanzB
 
@@ -157,28 +153,30 @@ def get_x_rotation(x,y,z): #Accelormeter x rotation
     radien = math.atan2(y, distanz(x,z))
     return math.degrees(radien)
 
-Vorwaerts(35)
-'''
-while gefundenG == False:    #Suchen des Gewichts, wenn Gewicht näher als 5cm aufhören von Fahren
-    if DistanzA() < 5:
-        Stop()
-        gefundenG = True
-'''
+Vorwaerts(40)
         
 time.sleep(1.5)
 
-Greifen(100)  #Greifen des Gewichts
-Vorwaerts(30) #Zum hindernis fahren
+Stop()
+print("Am gewicht")
+Greifen(30) #Greifen des Gewichts
+print("Gewicht gegriffen")
+
+Vorwaerts(40) #Zum hindernis fahren
 while gefundenH == False:   #Der Seitliche ultraschall-sensor schaut nach dem Hindernis und speichert die Entfernung
-    if  DistanzB() < 40:
-        HindernisDistanz = DistanzB()
+    if  DistanzB() < 35 and DistanzB() < 35:
+        HindernisDistanz = DistanzB() + 10
         gefundenH = True
 
+print("Hindernis gefunden")
+
 while verlorenH == False:   #Der Seitliche US-Sensor gibt an wenn er das Hindernis nicht mehr sieht, Fahrzeug fährt 2sek weiter und stoppt 
-    if DistanzB() > HindernisDistanz + 10:
+    if DistanzB() > HindernisDistanz and DistanzB() > HindernisDistanz:
         time.sleep(2)
         Stop()
         verlorenH = True
+
+print("Hindernis verloren")
 
 time.sleep(1)
 
@@ -203,17 +201,24 @@ while drehenF == False: #Am Gyroscope auslesen ob man sich um 90° gedreht hat
         drehenF = True
 ''' 
         
-time.sleep(2)
+time.sleep(2.00)
+Stop()
 
-Vorwaerts(30) #langsam vorwaerts
+print("Gedreht")
+
+Vorwaerts(40) #langsam vorwaerts
 
 while gefundenZ == False: #wenn näher als 50cm zum schrank gewicht fallen lassen
-    if DistanzA() < 40:
+    if DistanzA() < 50 && DistanzA() < 50:
         Stop()
         gefundenZ = True
 
+print("Ziel gefunden")
+
 time.sleep(2)
 Loslassen() #gehört zur dem daruber
+
+print("Gewicht losgelassen")
 
 MotorA1.stop
 MotorA2.stop  #Moteren anhalten
@@ -223,3 +228,4 @@ MotorC1.stop
 MotorC2.stop
 GPIO.cleanup                  #Gpio output und input beenden
 print("Cleanup")
+print("Fertig")
