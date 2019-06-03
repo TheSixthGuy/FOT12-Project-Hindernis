@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import RPi.GPIO as GPIO #Libary für die Benutzung von den GPIO-Pins
+import time             #Libary für Zeit-basierte Funktionen
+import smbus            #Libary für die benutzung des Datenbus-System I2C für das gyroscope
+import math             #Libary für Mathe Funktion wie z.B Wurzel von
+
+GPIO.setwarnings(False) #Ausschalten der Warnmeldung der GPIO-Pins
+GPIO.setmode(GPIO.BCM)   #Einschalten in das Breadboard-Pin system
+
+power1 = 0x6b       #Hexadezimaladresse für den Strom des gyroscope
+power2 = 0x6c       #?
+bus = smbus.SMBus(1)    #Starten des Datenbus-System für das Gyroscope
+address = 0x68 #Hexadezimaladresse des Gyroscope 
+
+def byteLesen(reg): #Lesen der Ausgabe des gyroscope
+    return bus.read_byte_data(address, reg)
+    
+def wordLesen(reg): #1.schritt zum auslesen eines 16-bit word
+    high = bus.read_byte_data(address, reg)
+
+def wordLesen_2c(reg): #2.schritt zum auslesen eines 16-bit word
+    wert = wordLesen(reg)
+    if (wert >= 0x8000):
+        return -((65535 - wert) + 1)
+    else:
+        return wert
+        
+def distanz(a,b): #Satz des phytagoras
+    return math.sqrt((a*a)+(b*b))
+    
+def get_y_rotation(x,y,z): #Accelormeter y rotation
+    radien = math.atan2(x, distanz(y,z))
+    return -math.degrees(radien)
+    
+def get_x_rotation(x,y,z): #Accelormeter x rotation
+    radien = math.atan2(y, distanz(x,z))
+    return math.degrees(radien)
+    '''
+    
+bus.write_byte_data(address,power1,0)   #der gyroscope wird initalisiert
+#TODO Gyro
+GyX = wordLesen_2c(0x43) #Die ausgabe der X-Achse des Gyros wird gelsesen
+StartX = GyX / 131  #(?) Wird in Grad umgerechnet
+if random.randint(0,1) == 1: #Temp Spaß-Funktion Munz-Wurf zum auswählen der Dreh-Methode
+    Kurve() #
+else:
+    DrehenStelle(30)
+'''
