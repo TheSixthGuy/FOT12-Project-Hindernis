@@ -158,7 +158,7 @@ print("Gedreht")
 Vorwaerts(40) #langsam vorwaerts
 
 while gefundenZ == False: #wenn näher als 50cm zum schrank gewicht fallen lassen
-    if DistanzA() < 50 && DistanzA() < 50:
+    if DistanzA() < 50 and DistanzA() < 50:
         Stop()
         gefundenZ = True
 
