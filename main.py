@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 import RPi.GPIO as GPIO #Libary für die Benutzung von den GPIO-Pins
 import time             #Libary für Zeit-basierte Funktionen
-import smbus            #Libary für die benutzung des Datenbus-System I2C für das gyroscope
-import math             #Libary für Mathe Funktion wie z.B Wurzel von
-import random           #Libary für zufällige Nummern(unötig)
 
 GPIO.setwarnings(False) #Ausschalten der Warnmeldung der GPIO-Pins
 GPIO.setmode(GPIO.BCM)   #Einschalten in das Breadboard-Pin system
@@ -15,9 +12,6 @@ verlorenH = False   #Hindernis verloren Bool
 gefundenZ = False   #Ziel gefunden Bool
 drehenF = False     #Drehen Fertig Bool
 
-Lenkung = 0.5  #Statische(?) Varibale für die Lenkung 1 = voll rechts, -1 = voll links
-power1 = 0x6b       #Hexadezimaladresse für den Strom des gyroscope
-power2 = 0x6c       #?
 TrigA = 23          #Varibale TRIGGER ist GPIO-Pinnummer für das Auslösen des US-Sensors
 EchoA = 24          #Varibale Echo ist die GPIO-Pinnummer für den Pin des Echos/Output des Us-Sensors
 TrigB = 17          #
@@ -27,9 +21,7 @@ MA2_Pin = 8
 MB1_Pin = 7
 MB2_Pin = 12
 MC1_Pin = 10
-MC2_Pin = 9
-bus = smbus.SMBus(1)    #Starten des Datenbus-System für das Gyroscope
-address = 0x68 #Hexadezimaladresse des Gyroscope 
+MC2_Pin = 9 
 
 GPIO.setup(TrigA, GPIO.OUT)    #init der Pins
 GPIO.setup(EchoA, GPIO.IN)    #
@@ -129,30 +121,6 @@ def DistanzB(): #das gleiche für US-SensorB(Hinten)
     DistanzB = round(DistanzB, 2)         #runden des Ergebnis auf 2 nachkommastellen
     return DistanzB
 
-def byteLesen(reg): #Lesen der Ausgabe des gyroscope
-    return bus.read_byte_data(address, reg)
-    
-def wordLesen(reg): #1.schritt zum auslesen eines 16-bit word
-    high = bus.read_byte_data(address, reg)
-
-def wordLesen_2c(reg): #2.schritt zum auslesen eines 16-bit word
-    wert = wordLesen(reg)
-    if (wert >= 0x8000):
-        return -((65535 - wert) + 1)
-    else:
-        return wert
-        
-def distanz(a,b): #Satz des phytagoras
-    return math.sqrt((a*a)+(b*b))
-    
-def get_y_rotation(x,y,z): #Accelormeter y rotation
-    radien = math.atan2(x, distanz(y,z))
-    return -math.degrees(radien)
-    
-def get_x_rotation(x,y,z): #Accelormeter x rotation
-    radien = math.atan2(y, distanz(x,z))
-    return math.degrees(radien)
-
 Vorwaerts(40)
         
 time.sleep(1.5)
@@ -180,26 +148,7 @@ print("Hindernis verloren")
 
 time.sleep(1)
 
-'''
-bus.write_byte_data(address,power1,0)   #der gyroscope wird initalisiert
-#TODO Gyro
-GyX = wordLesen_2c(0x43) #Die ausgabe der X-Achse des Gyros wird gelsesen
-StartX = GyX / 131  #(?) Wird in Grad umgerechnet
-
-if random.randint(0,1) == 1: #Temp Spaß-Funktion Munz-Wurf zum auswählen der Dreh-Methode
-    Kurve() #
-else:
-    DrehenStelle(30)
-'''
-
 DrehenStelle(100)
-
-'''
-while drehenF == False: #Am Gyroscope auslesen ob man sich um 90° gedreht hat
-    if (StartX - wordLesen_2c(0x43)) > 90:
-        Stop()
-        drehenF = True
-''' 
         
 time.sleep(2.00)
 Stop()
